@@ -79,8 +79,15 @@ public class DispatcherExecutor {
         String suffix = "&timestamp={timestamp}";
 
         try {
+            // 为每个机器人生成独立的时间戳，避免时间戳共享导致签名失败
+            String timestamp = String.valueOf(System.currentTimeMillis());
             if (!args.containsKey(TIMESTAMP)) {
-                args.put(TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+                args.put(TIMESTAMP, timestamp);
+            } else {
+                // 如果args中已有时间戳，创建一个新的副本以避免修改原始args
+                Map<String, Object> newArgs = new HashMap<>(args);
+                newArgs.put(TIMESTAMP, timestamp);
+                args = newArgs;
             }
             if (StringUtils.isNotBlank(secret)) {
                 suffix = "&sign={sign}&timestamp={timestamp}";
